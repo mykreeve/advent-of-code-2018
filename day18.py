@@ -11,7 +11,6 @@ for line in file:
 
 def get_adjacent(y,x,grid):
     borders=[]
-    # borders.append(grid[y][x])
     if (x-1) >= 0:
         borders.append(grid[y][x-1])
         if (y-1) >= 0:
