@@ -8,13 +8,11 @@ maxX=616
 minY=0
 maxY=2065
 
-
 # for example input - x from 494 to 507, y from 0 to 15
 # minX=494
 # maxX=507
 # minY=0
 # maxY=14
-
 
 earth={}
 for x in range(minX, maxX):
@@ -56,6 +54,7 @@ def count_waters(earth):
     got_to=0
     standing=0
     waters=0
+    # manually entered value for lowest y in range below
     for y in range(5,maxY):
         for x in range(minX,maxX):
             if (earth[x,y]=='~' or earth[x,y]=='|'):
