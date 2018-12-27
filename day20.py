@@ -72,7 +72,7 @@ print ("Answer for part one: ", highestVal)
 
 count=0
 for k,v in best_options.items():
-    if v>1000:
+    if v>=1000:
         count+=1
 
 print ("Answer for part two: ", count)
