@@ -36,8 +36,8 @@ for line in file:
 earth[500,0]='|'
 
 # def do_print(earth):
-#     for y in range(90,110):
-#         for x in range(500,540):
+#     for y in range(240,280):
+#         for x in range(530,580):
 #             print (earth[x,y], end="")
 #         print ("", end="\n")
 
@@ -55,13 +55,21 @@ def count_waters(earth):
                 standing+=1
     return (standing, waters, got_to)
 
+step=0
 while True:
     # do_print(earth)
-    k = count_waters(earth)
-    print (str(k[0]) + " standing, " + str(k[1]) + " waters - got to " + str(k[2]) + " out of " + str(maxY))
+    if step%10==0:
+        k = count_waters(earth)
+        print (str(k[0]) + " standing, " + str(k[1]) + " waters - got to " + str(k[2]) + " out of " + str(maxY-1) )
 
     for y in range(minY, maxY):
         for x in range(minX, maxX):
+            if earth[x,y]=='~':
+                # filling gaps
+                if (x,y+1) in earth:
+                    if earth[x,y+1]=='.' or earth[x,y+1]=='|':
+                        print ("filling gap " + str(x) + "," + str(y+1))
+                        earth[x,y+1]='~'
             if earth[x,y]=='|':
                 if (x,y+1) in earth:
                     if earth[x,y+1]=='.':
@@ -70,7 +78,13 @@ while True:
                         earth[x,y+1]='|'
                     if earth[x,y+1]=='#':
                         # water hits clay
-                        if earth[x-1,y]!='|' and earth[x+1,y]!='|':
+                        if earth[x-1,y]=='|' and earth[x+1,y]=='|':
+                            pass
+                        elif earth[x-1,y]=='|' and earth[x+1,y]=='.' and earth[x+1,y+1]=='.':
+                            pass
+                        elif earth[x+1,y]=='|' and earth[x-1,y]=='.' and earth[x-1,y+1]=='.':
+                            pass
+                        else:
                             # print("water hits clay")
                             max=x
                             min=x
@@ -84,6 +98,10 @@ while True:
                         # water hits standing water
                         if earth[x-1,y]=='|' and earth[x+1,y]=='|':
                             pass
+                        elif earth[x-1,y]=='|' and ((earth[x+1,y]=='.' and earth[x+1,y+1]=='.') or (earth[x+1,y]=='#' and earth[x+1,y+1]=='#')):
+                            pass
+                        elif earth[x+1,y]=='|' and ((earth[x-1,y]=='.' and earth[x-1,y+1]=='.') or (earth[x-1,y]=='#' and earth[x-1,y+1]=='#')):
+                            pass
                         else:
                             min=x
                             max=x
@@ -93,21 +111,22 @@ while True:
                                 min -= 1
                             # still contained in clay
                             if earth[min,y]=='#' and earth[max,y]=='#':
-                                # print ("contained in clay " + str(min+1) + "," + str(y) + " - " + str(max) + "," + str(y))
+                                print ("contained in clay " + str(min+1) + "," + str(y) + " - " + str(max) + "," + str(y))
                                 for i in range(min+1,max):
                                     earth[i,y]='~'
                             # contained in clay on left only
                             if earth[min,y]=='#' and earth[max,y]!='#':
-                                # print ("contained on left only " + str(min+1) + "," + str(y) + " - " + str(max+1) + "," + str(y))
+                                print ("contained on left only " + str(min+1) + "," + str(y) + " - " + str(max+1) + "," + str(y))
                                 for i in range(min+1,max+1):
                                     earth[i,y]='|'
                             # contained in clay on right only
                             if earth[min,y]!='#' and earth[max,y]=='#':
-                                # print ("contained on right only " + str(min) + "," + str(y) + " - " + str(max) + "," + str(y))
+                                print ("contained on right only " + str(min) + "," + str(y) + " - " + str(max) + "," + str(y))
                                 for i in range(min,max):
                                     earth[i,y]='|'
                             # unconstrained flow
                             if earth[min,y]!='#' and earth[max,y]!='#':
-                                # print ("unconstrained " + str(min) + "," + str(y) + " - " + str(max+1) + "," + str(y))
+                                print ("unconstrained " + str(min) + "," + str(y) + " - " + str(max+1) + "," + str(y))
                                 for i in range(min,max+1):
                                     earth[i,y]='|'
+    step+=1
