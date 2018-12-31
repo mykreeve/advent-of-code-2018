@@ -158,7 +158,7 @@ while exist('G') and exist('E'):
                             steps,b,a = heapq.heappop(queue)
                             loc = (a,b)
                             if steps > dist:
-                                print ("Calculating distance " + str(steps) + " - " + str(len(queue)))
+                                # print ("Calculating distance " + str(steps) + " - " + str(len(queue)))
                                 dist=steps
                             if loc in desired:
                                 stop=steps
