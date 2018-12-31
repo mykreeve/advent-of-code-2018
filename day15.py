@@ -237,10 +237,10 @@ while True:
                     elfhp += area[x,y]['hitPoints']
                     # print ("E: " + str(area[x,y]['hitPoints']))
         print ("-- Turn " + str(turn) + " completed. GoblinHP left: " + str(goblinhp) + ", ElfHP left: " + str(elfhp))
-        # for y in range(maxY):
-        #     for x in range(maxX):
-        #         print (area[x,y]['value'], end="")
-        #     print("")
+        for y in range(maxY):
+            for x in range(maxX):
+                print (area[x,y]['value'], end="")
+            print("")
         
         if goblinhp > elfhp:
             score = goblinhp * turn
