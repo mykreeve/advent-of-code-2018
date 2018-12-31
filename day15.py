@@ -148,14 +148,15 @@ while exist('G') and exist('E'):
                 else:
                     #no opponents nearby, identify closest enemy
                     if is_enemy_accessible(x,y,creatureType):
-                        queue = collections.deque([((x,y),0)])
+                        queue = [(0,y,x)]
                         desired=desired_squares(creatureType)
                         meta={(x,y): (0, None)}
                         visited=set()
                         dist=0
                         stop=999
                         while len(queue) > 0:
-                            loc, steps = queue.popleft()
+                            steps,b,a = heapq.heappop(queue)
+                            loc = (a,b)
                             if steps > dist:
                                 print ("Calculating distance " + str(steps) + " - " + str(len(queue)))
                                 dist=steps
@@ -169,7 +170,8 @@ while exist('G') and exist('E'):
                                 if option in visited:
                                     continue
                                 if option not in visited:
-                                    queue.append((option, steps+1))
+                                    if (steps+1, option[1], option[0]) not in queue:
+                                        heapq.heappush(queue, (steps+1, option[1], option[0]))
                             visited.add(loc)
     
                         try:   
@@ -190,9 +192,6 @@ while exist('G') and exist('E'):
                         target=closest
                         while meta[closest][0] > 1:
                             closest = meta[closest][1]
-
-                        print (closest)
-                        test=input(" next ")
 
                     else:
                         turn_incomplete=True
