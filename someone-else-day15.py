@@ -104,9 +104,6 @@ class Grid(dict):
                     visiting.append((nb, dist + 1))
             seen.add(pos)
 
-        print(meta)
-        test=input(" yes... ")
-
         try:
             min_dist, closest = min((dist, pos) for pos, (dist, parent) in meta.items() if pos in targets)
         except ValueError:
@@ -114,6 +111,9 @@ class Grid(dict):
 
         while meta[closest][0] > 1:
             closest = meta[closest][1]
+
+        print (closest)
+        test=input(" next ")
 
         return closest
 

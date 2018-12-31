@@ -1,5 +1,6 @@
 import heapq
 import copy
+import collections
 from operator import itemgetter
 
 filename="input/day15input.txt"
@@ -64,6 +65,19 @@ def adjacents(loc,creature):
         adjacents.append((x,y+1))
     return adjacents
 
+def empty_adjacents(loc):
+    x,y=loc
+    adjacents=[]
+    if area[x+1,y]['value']=='.':
+        adjacents.append((x+1,y))
+    if area[x,y+1]['value']=='.':
+        adjacents.append((x,y+1))
+    if area[x,y-1]['value']=='.':
+        adjacents.append((x,y-1))
+    if area[x-1,y]['value']=='.':
+        adjacents.append((x-1,y))
+    return adjacents
+
 def do_a_fight(x,y,creatureType):
     adj_opponents=adjacent_opponents(x,y,creatureType)
     if len(adj_opponents)>0:
@@ -95,6 +109,17 @@ def is_enemy_accessible(x,y,creature):
                 heapq.heappush (queue, (option))
     return False
 
+def desired_squares(creature):
+    desired=[]
+    for y in range(maxY):
+        for x in range(maxX):
+            if area[x,y]['value']==get_opponent(creature):
+                for a in empty_adjacents((x,y)):
+                    desired.append(a)
+    desired=sorted(desired, key=itemgetter(0))
+    desired=sorted(desired, key=itemgetter(1))
+    return desired
+                
 turn=1
 while exist('G') and exist('E'):
     turn_incomplete=False
@@ -123,59 +148,57 @@ while exist('G') and exist('E'):
                 else:
                     #no opponents nearby, identify closest enemy
                     if is_enemy_accessible(x,y,creatureType):
-                        queue = [(0,(x,y),[])]
-                        opponent_distances={}
-                        visited=[]
+                        queue = collections.deque([((x,y),0)])
+                        desired=desired_squares(creatureType)
+                        meta={(x,y): (0, None)}
+                        visited=set()
                         dist=0
-                        step_max=999
+                        stop=999
                         while len(queue) > 0:
-                            steps,loc,route = heapq.heappop(queue)
-                            if steps>dist:
+                            loc, steps = queue.popleft()
+                            if steps > dist:
+                                print ("Calculating distance " + str(steps) + " - " + str(len(queue)))
                                 dist=steps
-                                print ("Searching depth " + str(dist) + " - " + str(len(queue)))
-                            if steps > step_max:
+                            if loc in desired:
+                                stop=steps
+                            if steps==stop+1:
                                 break
-                            a,b=loc
-                            visited.append(loc)
-                            route=copy.deepcopy(route)
-                            if area[a,b]['value']==get_opponent(creatureType):
-                                if (a,b) in opponent_distances and steps > opponent_distances[(a,b)]['steps']:
+                            for option in empty_adjacents(loc):
+                                if option not in meta or meta[option][0] > steps+1:
+                                    meta[option]=(steps+1, loc)
+                                if option in visited:
                                     continue
-                                elif (a,b) in opponent_distances and steps == opponent_distances[(a,b)]['steps']:
-                                    opponent_distances[(a,b)]['routes'].append(route)
-                                elif (a,b) in opponent_distances and steps < opponent_distances[(a,b)]['steps']:
-                                    opponent_distances[(a,b)]={'steps':steps, 'routes': [route]}
-                                else:
-                                    opponent_distances[(a,b)]={'steps':steps, 'routes': [route]}
-                                    step_max=steps
-
-                            if loc != (x,y):
-                                route.append(loc)
-                            for option in adjacents(loc,creatureType):
                                 if option not in visited:
-                                    heapq.heappush (queue, (steps+1, option, route))
+                                    queue.append((option, steps+1))
+                            visited.add(loc)
+    
+                        try:   
+                            opts=[]
+                            for pos, (dist,parent) in meta.items():
+                                if pos in desired:
+                                    xpos=pos[0]
+                                    ypos=pos[1]
+                                    opts.append((xpos, ypos, dist, parent))
+                            opts=sorted(opts, key=itemgetter(0))
+                            opts=sorted(opts, key=itemgetter(1))
+                            opts=sorted(opts, key=itemgetter(2))
+                            min_dist = opts[0][2]
+                            closest = (opts[0][0], opts[0][1])
+                        except ValueError:
+                            closest=None
+
+                        target=closest
+                        while meta[closest][0] > 1:
+                            closest = meta[closest][1]
+
+                        print (closest)
+                        test=input(" next ")
+
                     else:
                         turn_incomplete=True
-                        opponent_distances={}
-                    if len(opponent_distances) > 0:
-                        rearrange=[]
-                        for k,v in opponent_distances.items():
-                            target=k
-                            xpos,ypos=k
-                            stepval=v['steps']
-                            routes=v['routes']
-                            rearrange.append({'x':xpos, 'y':ypos, 'steps': stepval, 'routes':routes})
-                        rearrange=sorted(rearrange, key=itemgetter('x'))
-                        rearrange=sorted(rearrange, key=itemgetter('y'))
-                        rearrange=sorted(rearrange, key=itemgetter('steps'))
-                        best=rearrange[0]['routes']
-                        first_steps=[]
-                        for route in best:
-                            if route[0] not in first_steps:
-                                first_steps.append(route[0])
-                        first_steps=sorted(first_steps, key=itemgetter(0))
-                        first_steps=sorted(first_steps, key=itemgetter(1))
-                        dest=first_steps[0]
+                        closest=None
+                    if closest:
+                        dest=closest
 
                         print ("Creature at location " + str(x) + "," + str(y) + " moves to " + str(dest) + ", in the direction of " +str(target))
                         hp=area[x,y]['hitPoints']
