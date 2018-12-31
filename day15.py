@@ -71,7 +71,7 @@ def do_a_fight(x,y,creatureType):
         opponents=sorted(opponents, key=itemgetter(1))
         opponents=sorted(opponents, key=itemgetter(3))
         selected_opponent=opponents[0]
-        print ("Creature at location " + str(x) + "," + str(y) + " hits opponent at " + str(selected_opponent[0]) + "," + str(selected_opponent[1]))
+        # print ("Creature at location " + str(x) + "," + str(y) + " hits opponent at " + str(selected_opponent[0]) + "," + str(selected_opponent[1]))
         if selected_opponent[3]-3 <= 0 and selected_opponent[2]=='E':
             elves_died=True
             area[selected_opponent[0],selected_opponent[1]]={'value':'.'}
@@ -253,9 +253,9 @@ while True:
         if elf_damage==3:
             part1score=score
         turn +=1
+    print ("=== Completed analysis for elf damage: " + str(elf_damage))
     if elves_died==False:
         break
-    print ("=== Completed analysis for elf damage: " + str(elf_damage))
     elf_damage+=1
 
 print ("Answer to part one: " + str(part1score))
